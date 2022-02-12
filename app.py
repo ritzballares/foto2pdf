@@ -3,6 +3,9 @@ from pathlib import Path
 from werkzeug.utils import secure_filename
 from flask_mysqldb import MySQL
 from dotenv import load_dotenv
+from fpdf import FPDF
+from PIL import Image
+from glob import glob
 import os
 
 
@@ -66,8 +69,30 @@ def convert():
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], user_id, 'images', filename))
 
-
         cursor.execute(f"INSERT INTO users(images_dir, pdf_dir) VALUES('{user_images_dir}', '{user_pdf_dir}')")
+        
+        # Create PDF
+        image_filenames = []
+
+        for extension in SUPPORTED_EXTENSIONS:
+            image_filenames.extend(glob(f'{user_images_dir}/*{extension}'))
+
+        pdf = FPDF()
+        pdf.oversized_images = 'DOWNSCALE'
+
+        for image in image_filenames:
+            img = Image.open(f'{image}')
+            img_width, img_height = img.size
+
+            # Calculate new height to so the image does not go out of bounds
+            # Divide the image height by its width and multiply the result with the pdf's max width
+            new_height = (img_height / img_width) * pdf.epw
+
+            pdf.add_page()
+            pdf.image(img, 0, 0, pdf.epw, new_height)
+
+        pdf.output(f'{user_pdf_dir}/foto2pdf.pdf')
+
         mysql.connection.commit()
         cursor.close()
 
