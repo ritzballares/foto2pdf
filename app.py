@@ -104,7 +104,7 @@ def update(id):
     id = escape(id)
 
     cursor = mysql.connection.cursor()
-    id_exists = cursor.execute(f"SELECT * FROM users where id='{id}'")
+    id_exists = cursor.execute(f"SELECT * FROM users WHERE id='{id}'")
 
     if not id_exists:
         msg = {'error': 'id does not exist'}
@@ -125,7 +125,7 @@ def update(id):
             msg = {'error': f'unsupported file type - {extension}'}
             return jsonify(msg), 400
 
-    cursor.execute(f"SELECT images_dir, pdf_dir FROM users where id='{id}'")
+    cursor.execute(f"SELECT images_dir, pdf_dir FROM users WHERE id='{id}'")
     directories = cursor.fetchall()
 
     # Indexing twice gets the directories by itself (no parenthesis and commas)
@@ -171,6 +171,8 @@ def update(id):
 
     pdf.output(f'{pdf_dir}/foto2pdf.pdf')
 
+    cursor.execute(f"UPDATE users SET modified=now() WHERE id='{id}'")
+    mysql.connection.commit()
     cursor.close()
     msg = {'success': 'true', 'id': f'{id}'}
     return jsonify(msg), 200
@@ -180,7 +182,7 @@ def download(id):
     id = escape(id)
 
     cursor = mysql.connection.cursor()
-    cursor.execute(f"SELECT pdf_dir FROM users where id='{id}'")
+    cursor.execute(f"SELECT pdf_dir FROM users WHERE id='{id}'")
     pdf_dir = cursor.fetchall()
     cursor.close()
 
