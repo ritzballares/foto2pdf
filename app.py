@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from pathlib import Path
 from werkzeug.utils import secure_filename
 from flask_mysqldb import MySQL
@@ -67,7 +67,7 @@ def convert():
 
             # Save uploaded images
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], user_id, 'images', filename))
+            file.save(os.path.join(user_images_dir, filename))
 
         cursor.execute(f"INSERT INTO users(images_dir, pdf_dir) VALUES('{user_images_dir}', '{user_pdf_dir}')")
         
@@ -98,3 +98,17 @@ def convert():
 
         msg = {'success': 'true', 'id': f'{user_id}'}
         return jsonify(msg), 200
+
+@app.route('/download/<id>', methods=['GET'])
+def download(id):
+    cursor = mysql.connection.cursor()
+    cursor.execute(f"SELECT pdf_dir FROM users where id='{id}'")
+    pdf_dir = cursor.fetchall()
+    cursor.close()
+
+    if len(pdf_dir) == 0:
+        msg = {'error': 'file not found'}
+        return jsonify(msg), 404
+
+    pdf_dir = pdf_dir[0][0] # Gets the pdf_directory by itself (no parenthesis and commas)
+    return send_from_directory(pdf_dir, 'foto2pdf.pdf')
