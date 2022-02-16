@@ -1,3 +1,5 @@
 __pycache__
 venv/
-static/
+app/static
+app/__pycache__
+.DS_Store
