@@ -20,7 +20,7 @@ try:
 
     print('Creating table...')
     cursor.execute("USE foto2pdf")
-    cursor.execute("CREATE TABLE users(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, images_dir VARCHAR(30), pdf_dir VARCHAR(30), created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)")
+    cursor.execute("CREATE TABLE users(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, images_dir VARCHAR(30), pdf_dir VARCHAR(30), created TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
 
     connection.commit()
     connection.close()
