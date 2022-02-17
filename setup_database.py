@@ -13,13 +13,15 @@ try:
         password = os.environ.get('password')
     )
 
+    db = os.environ.get('db')
+
     cursor = connection.cursor()
 
     print('Creating database...')
-    cursor.execute("CREATE DATABASE foto2pdf")
+    cursor.execute(f"CREATE DATABASE {db}")
 
     print('Creating table...')
-    cursor.execute("USE foto2pdf")
+    cursor.execute(f"USE {db}")
     cursor.execute("CREATE TABLE users(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, images_path VARCHAR(30), pdf_path VARCHAR(30), created TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
 
     connection.commit()
